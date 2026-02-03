@@ -5,41 +5,102 @@ from .models import Category, OrderItem
 from .serializers import CategorySerializer
 from rest_framework import status
 # Create your views here.
-from rest_framework.views import APIView
 
-class CategoryList(APIView):
-   def get(self, request):
+# ViewSet 
+from rest_framework import viewsets
+class CategoryList(viewsets.ViewSet):
+   def list(self, request):
       category = Category.objects.all()
       serializer = CategorySerializer(category, many=True)
       return Response(serializer.data)
-   
-   def post(self, request):
+
+   def create(self, request):
       serializer = CategorySerializer(data = request.data)
       serializer.is_valid(raise_exception=True)
       serializer.save()
       return Response({"detail": "New data created", "data": serializer.data}, status = status.HTTP_201_CREATED)
 
-
-class CategoryDetail(APIView):
-   def get(self, request, id):
-      category = Category.objects.get(id = id)
+class CategoryDetail(viewsets.ViewSet):
+   def retrieve(self, request, pk=None):
+      category = Category.objects.get(id = pk)
       serializer = CategorySerializer(category)
       return Response(serializer.data)
    
-   def put(self, request, id):
-      category = Category.objects.get(id = id)
+   def update(self, request, pk=None):
+      category = Category.objects.get(id = pk)
       serializer = CategorySerializer(category , data = request.data) 
       serializer.is_valid(raise_exception=True)
       serializer.save()
       return Response({"detail": "Data edited", "data": serializer.data})
    
-   def delete(self, request, id):
-      category = Category.objects.get(id = id)
+   def destroy(self, request, pk=None):
+      category = Category.objects.get(id = pk)
       items = OrderItem.objects.filter(food__category = category).count()
       if items > 0:
          return Response({"detail":"Data can't be deleted. Category related to the food in OrderItem"})
       category.delete()
       return Response({"detail":"Data has been deleted."}, status = status.HTTP_204_NO_CONTENT)
+
+
+
+
+# Mixins, Generic APIs
+# from rest_framework import mixins
+# from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+# class CategoryList(ListCreateAPIView):
+#    queryset = Category.objects.all()
+#    serializer_class = CategorySerializer
+
+# class CategoryDetail(RetrieveUpdateDestroyAPIView):
+#    queryset = Category.objects.all()
+#    serializer_class = CategorySerializer
+   
+#    def delete(self, request, id):
+#       category = Category.objects.get(id = id)
+#       items = OrderItem.objects.filter(food__category = category).count()
+#       if items > 0:
+#          return Response({"detail":"Data can't be deleted. Category related to the food in OrderItem"})
+#       category.delete()
+#       return Response({"detail":"Data has been deleted."}, status = status.HTTP_204_NO_CONTENT)
+
+
+
+# APIView
+# from rest_framework.views import APIView
+
+# class CategoryList(APIView):
+#    def get(self, request):
+#       category = Category.objects.all()
+#       serializer = CategorySerializer(category, many=True)
+#       return Response(serializer.data)
+
+#    def post(self, request):
+#       serializer = CategorySerializer(data = request.data)
+#       serializer.is_valid(raise_exception=True)
+#       serializer.save()
+#       return Response({"detail": "New data created", "data": serializer.data}, status = status.HTTP_201_CREATED)
+
+
+# class CategoryDetail(APIView):
+#    def get(self, request, id):
+#       category = Category.objects.get(id = id)
+#       serializer = CategorySerializer(category)
+#       return Response(serializer.data)
+   
+#    def put(self, request, id):
+#       category = Category.objects.get(id = id)
+#       serializer = CategorySerializer(category , data = request.data) 
+#       serializer.is_valid(raise_exception=True)
+#       serializer.save()
+#       return Response({"detail": "Data edited", "data": serializer.data})
+   
+#    def delete(self, request, id):
+#       category = Category.objects.get(id = id)
+#       items = OrderItem.objects.filter(food__category = category).count()
+#       if items > 0:
+#          return Response({"detail":"Data can't be deleted. Category related to the food in OrderItem"})
+#       category.delete()
+#       return Response({"detail":"Data has been deleted."}, status = status.HTTP_204_NO_CONTENT)
 
 
 
