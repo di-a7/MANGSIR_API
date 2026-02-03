@@ -1,0 +1,38 @@
+# Restaurant Management System
+
+- User
+   - id       [int]
+   - name      [string] 
+   - contact_details [phone, email]
+
+- Category
+   - id     [int]
+   - name   [char]
+
+- Food
+   - id        [int]
+   - name      [char]
+   - category_id  [Foreign Key] [o-to-m] (one-to-one-field)
+   - price        [float]
+
+- Table
+   - id           [int]
+   - name/number  [char]
+   - avaibility   [Boolean]
+   - capacity     [int]
+
+- Order
+   - id           [id]
+   - User(Foreign Key) [o-to-m]    
+   - Food(Foreign Key) [m to m]    (Junction Table)
+   - quantity     [int]
+   - total_price  [float]
+   - status
+
+- OrderItem    (Junction Table)
+   - id
+   - Order_id [FK]
+   - Food_id [FK]
+
+- setup project, app, .gitignore, .env ,git repo, github push, 
+- model creation
