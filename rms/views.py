@@ -1,37 +1,16 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Category, OrderItem
-from .serializers import CategorySerializer
+from .models import *
+from .serializers import *
 from rest_framework import status
 # Create your views here.
+# ModelViewset
 
-# ViewSet 
-from rest_framework import viewsets
-class CategoryList(viewsets.ViewSet):
-   def list(self, request):
-      category = Category.objects.all()
-      serializer = CategorySerializer(category, many=True)
-      return Response(serializer.data)
-
-   def create(self, request):
-      serializer = CategorySerializer(data = request.data)
-      serializer.is_valid(raise_exception=True)
-      serializer.save()
-      return Response({"detail": "New data created", "data": serializer.data}, status = status.HTTP_201_CREATED)
-
-class CategoryDetail(viewsets.ViewSet):
-   def retrieve(self, request, pk=None):
-      category = Category.objects.get(id = pk)
-      serializer = CategorySerializer(category)
-      return Response(serializer.data)
-   
-   def update(self, request, pk=None):
-      category = Category.objects.get(id = pk)
-      serializer = CategorySerializer(category , data = request.data) 
-      serializer.is_valid(raise_exception=True)
-      serializer.save()
-      return Response({"detail": "Data edited", "data": serializer.data})
+from rest_framework.viewsets import ModelViewSet
+class CategoryViewset(ModelViewSet):
+   queryset = Category.objects.all()
+   serializer_class = CategorySerializer
    
    def destroy(self, request, pk=None):
       category = Category.objects.get(id = pk)
@@ -40,6 +19,48 @@ class CategoryDetail(viewsets.ViewSet):
          return Response({"detail":"Data can't be deleted. Category related to the food in OrderItem"})
       category.delete()
       return Response({"detail":"Data has been deleted."}, status = status.HTTP_204_NO_CONTENT)
+
+
+class FoodViewset(ModelViewSet):
+   queryset = Food.objects.all()
+   serializer_class = FoodSerialzier
+
+
+
+# ViewSet 
+# from rest_framework import viewsets
+# class CategoryList(viewsets.ViewSet):
+#    def list(self, request):
+#       category = Category.objects.all()
+#       serializer = CategorySerializer(category, many=True)
+#       return Response(serializer.data)
+
+#    def create(self, request):
+#       serializer = CategorySerializer(data = request.data)
+#       serializer.is_valid(raise_exception=True)
+#       serializer.save()
+#       return Response({"detail": "New data created", "data": serializer.data}, status = status.HTTP_201_CREATED)
+
+# class CategoryDetail(viewsets.ViewSet):
+#    def retrieve(self, request, pk=None):
+#       category = Category.objects.get(id = pk)
+#       serializer = CategorySerializer(category)
+#       return Response(serializer.data)
+   
+#    def update(self, request, pk=None):
+#       category = Category.objects.get(id = pk)
+#       serializer = CategorySerializer(category , data = request.data) 
+#       serializer.is_valid(raise_exception=True)
+#       serializer.save()
+#       return Response({"detail": "Data edited", "data": serializer.data})
+   
+#    def destroy(self, request, pk=None):
+#       category = Category.objects.get(id = pk)
+#       items = OrderItem.objects.filter(food__category = category).count()
+#       if items > 0:
+#          return Response({"detail":"Data can't be deleted. Category related to the food in OrderItem"})
+#       category.delete()
+#       return Response({"detail":"Data has been deleted."}, status = status.HTTP_204_NO_CONTENT)
 
 
 
