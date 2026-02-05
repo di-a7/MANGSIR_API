@@ -44,4 +44,4 @@ class FoodSerialzier(serializers.ModelSerializer):
 #       instance.save()
 #       return instance
 
-validated_data = {"name":"Snacks"}
+# validated_data = {"name":"Snacks"}
