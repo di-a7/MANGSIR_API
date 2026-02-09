@@ -8,14 +8,34 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .filter import FoodFilter
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
+
 # Create your views here.
 # ModelViewset
 
-from rest_framework.viewsets import ModelViewSet
 class CategoryViewset(ModelViewSet):
    queryset = Category.objects.all()
    serializer_class = CategorySerializer
+   permission_classes = [IsAuthenticatedOrReadOnly]
    
+   @extend_schema(
+      parameters=[
+         OpenApiParameter(name='name', description='Name of the food', required=False, type=str),
+      ],
+      description='This is a GET food api',
+   )
+   def list(self, request):
+      return super().list(request)
+   
+   @extend_schema(
+      parameters=[
+         OpenApiParameter(name='name', description='Filter by name', required=False, type=str),
+      ],
+      description='this api delete a category',
+   )
    def destroy(self, request, pk=None):
       category = Category.objects.get(id = pk)
       items = OrderItem.objects.filter(food__category = category).count()
@@ -33,6 +53,17 @@ class FoodViewset(ModelViewSet):
    search_fields = ['name', 'category__name']
    # filterset_fields = ['name', 'category']    # Food.objects.filter(name = 'V8 pet', category__id=2)
    filterset_class = FoodFilter
+   permission_classes = [IsAuthenticatedOrReadOnly]
+   
+   @extend_schema(
+      parameters=[
+         OpenApiParameter(name='description', description='Name of the food', required=False, type=str),
+      ],
+      description='This is a GET food api',
+   )
+   def list(self, request):
+      # your non-standard behaviour
+      return super().list(request)
 
 # pagination, filtering, searching
 
