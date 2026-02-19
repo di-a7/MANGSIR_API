@@ -8,7 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .filter import FoodFilter
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
@@ -16,7 +16,7 @@ from drf_spectacular.types import OpenApiTypes
 # Create your views here.
 # ModelViewset
 
-class CategoryViewset(ModelViewSet):
+class CategoryViewset(ReadOnlyModelViewSet):
    queryset = Category.objects.all()
    serializer_class = CategorySerializer
    permission_classes = [IsAuthenticatedOrReadOnly]
@@ -45,7 +45,7 @@ class CategoryViewset(ModelViewSet):
       return Response({"detail":"Data has been deleted."}, status = status.HTTP_204_NO_CONTENT)
 
 
-class FoodViewset(ModelViewSet):
+class FoodViewset(ReadOnlyModelViewSet):
    queryset = Food.objects.all().select_related('category')
    serializer_class = FoodSerialzier
    pagination_class = PageNumberPagination
@@ -64,6 +64,20 @@ class FoodViewset(ModelViewSet):
    def list(self, request):
       # your non-standard behaviour
       return super().list(request)
+
+class OrderViewset(ModelViewSet):
+   queryset = Order.objects.prefetch_related('items').all()
+   serializer_class = OrderSerializer
+   pagination_class = PageNumberPagination
+   filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+   search_filter = ['user__username']
+   filterset_field = ['status','payment_status']
+   permission_classes = [IsAuthenticated]
+
+
+
+
+
 
 # pagination, filtering, searching
 

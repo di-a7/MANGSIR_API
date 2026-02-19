@@ -20,4 +20,5 @@ class UserAdmin(UA):
       ),
       (("Important dates"), {"fields": ("last_login", "date_joined")}),
    )
+   list_display = ['id','username','phone']
 admin.site.register(User, UserAdmin)

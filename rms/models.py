@@ -48,8 +48,8 @@ class Order(models.Model):
       return f"Order #{self.id} by {self.user.username}"
 
 class OrderItem(models.Model):
-   order = models.ForeignKey(Order, on_delete=models.PROTECT)
-   food = models.ForeignKey(Food,on_delete=models.PROTECT)
+   order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name='items')
+   food = models.ForeignKey(Food,on_delete=models.PROTECT, related_name = 'items')
 
 # OrderItem -> Category
 # food__category__name

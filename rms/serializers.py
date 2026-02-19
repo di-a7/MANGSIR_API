@@ -31,7 +31,49 @@ class FoodSerialzier(serializers.ModelSerializer):
    def get_price_with_vat(self, food:Food):
       return food.price * 0.13 + food.price
 
+class OrderItemSerialzier(serializers.ModelSerializer):
+   class Meta:
+      model = OrderItem
+      fields = ['food']
 
+class OrderSerializer(serializers.ModelSerializer):
+   user = serializers.HiddenField(default = serializers.CurrentUserDefault())
+   items = OrderItemSerialzier(many=True)
+   status = serializers.CharField(read_only=True)
+   payment_status = serializers.CharField(read_only=True)
+   total_price = serializers.FloatField(read_only=True)
+   class Meta:
+      model = Order
+      fields = ['user','quantity','total_price','status','payment_status','items']
+   
+   def create(self, validated_data):
+      items = validated_data.pop('items')
+      total_price = 0
+      for item in items:
+         food_item = item.get('food')
+         total_price += (validated_data.get('quantity') * food_item.price)
+      
+      order = Order.objects.create(total_price = total_price, **validated_data)
+      for item in items:
+         OrderItem.objects.create(order = order, food = item.get('food'))
+      return order
+
+# validated_data = {
+#    "quantity": 5,
+#    "total_price": 500,
+# }
+
+# items = {
+#       {
+#       "food": 200
+#       },
+#    {
+#       "food": 250
+#       },
+#    {
+#       "food": 50
+#       }
+# }
 # class CategorySerializer(serializers.Serializer):
 #    id = serializers.IntegerField(read_only=True)
 #    name = serializers.CharField()
